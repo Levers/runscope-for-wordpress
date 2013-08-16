@@ -1,7 +1,7 @@
 <?php
 class runscopeSettings {
 	public function __construct() {
-		if ( is_admin() ){
+		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 		}
@@ -14,25 +14,24 @@ class runscopeSettings {
 
 	public function create_admin_page() {
 		?>
-	<div class="wrap">
-		<?php screen_icon(); ?>
-		<h2>Settings</h2>
-		<form method="post" action="options.php">
-			<?php
-
-			settings_fields( 'runscope_option_group' );
-			do_settings_sections( 'runscope-settings-admin' );
-		?>
-			<?php submit_button(); ?>
-		</form>
-	</div>
-	<?php
+		<div class="wrap">
+			<?php screen_icon(); ?>
+			<h2>Settings</h2>
+			<form method="post" action="options.php">
+				<?php
+				settings_fields( 'runscope_option_group' );
+				do_settings_sections( 'runscope-settings-admin' );
+				submit_button();
+				?>
+			</form>
+		</div>
+		<?php
 	}
 
 	public function page_init() {
 		register_setting( 'runscope_option_group', 'array_key', array( $this, 'check_ID' ) );
 
-			add_settings_section(
+		add_settings_section(
 			'setting_section_id',
 			'Bucket Settings',
 			array( $this, 'print_section_info' ),
@@ -65,7 +64,9 @@ class runscopeSettings {
 	}
 
 	public function create_an_id_field(){
-		?><input type="text" id="bucket" name="array_key[runscope_bucket_id]" value="<?php echo get_option( 'runscope_bucket_id' ); ?>" /><?php
+		?>
+		<input type="text" id="bucket" name="array_key[runscope_bucket_id]" value="<?php echo get_option( 'runscope_bucket_id' ); ?>" />
+		<?php
 	}
 }
 
