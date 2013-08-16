@@ -1,5 +1,7 @@
 <?php
-class runscopeSettings {
+
+class Runscope_Settings {
+
 	public function __construct() {
 		if ( is_admin() ) {
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
@@ -70,4 +72,4 @@ class runscopeSettings {
 	}
 }
 
-$runscopeSettings = new runscopeSettings();
+$runscope_settings = new Runscope_Settings();
