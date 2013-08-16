@@ -28,56 +28,56 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 include('runscopeSettings.php');
 
-function runRequest()
-{
-	add_filter('pre_http_request', 'runscopeRequest',10, 3);
-}
+class Runscope_For_Wordpress {
 
-add_action('init', 'runRequest');
+	public function __construct() {
+		add_action( 'init', array( $this, 'init' ) );
+	}
 
-function runscopeRequest($content, $r, $url)
-{
-	$bucket = get_option( 'runscope_bucket_id' );
+	public function init() {
+		add_filter( 'pre_http_request', array( $this, 'runscope_request' ), 10, 3 );
+	}
 
-	if(empty($bucket))
+	public function runscope_request( $content, $r, $url )
 	{
+		$bucket = get_option( 'runscope_bucket_id' );
+
+		if ( empty( $bucket ) or strstr( $url, 'runscope' ) )
+		{
+			return false;
+		}
+
+		$parsed = parse_url($url);
+
+		$parsed['host'] = str_replace( '.', '-', $parsed['host'] ).'-'.$bucket.'.runscope.net';
+
+		$url = $this->unparse_url($parsed);
+
+		if ( isset( $r['headers']['Host'] ) )
+		{
+			$r['headers']['Host'] = $parsed['host'];
+		}
+
+		$http = _wp_http_get_object();
+
+		$http->request( $url, $r );
+
 		return false;
 	}
 
-	if(strstr($url, 'runscope'))
-	{
-		return false;
+	public function unparse_url( $parsed_url ) {
+		$scheme   = isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] . '://' : '';
+		$host     = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
+		$port     = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
+		$user     = isset( $parsed_url['user'] ) ? $parsed_url['user'] : '';
+		$pass     = isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass']  : '';
+		$pass     = ( $user || $pass ) ? "$pass@" : '';
+		$path     = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
+		$query    = isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '';
+		$fragment = isset( $parsed_url['fragment'] ) ? '#' . $parsed_url['fragment'] : '';
+		return "$scheme$user$pass$host$port$path$query$fragment";
 	}
 
-	$runscopekey = $bucket;
-
-	$parsed = parse_url($url);
-
-	$parsed['host'] = str_replace('.', '-', $parsed['host']).'-'.$runscopekey.'.runscope.net';
-
-	$url = unparse_url($parsed);
-
-	if(isset($r['headers']['Host']))
-	{
-		$r['headers']['Host'] = $parsed['host'];
-	}
-
-	$http = _wp_http_get_object();
-
-	$http->request($url, $r);
-
-	return false;
 }
 
-function unparse_url($parsed_url) {
-	$scheme   = isset($parsed_url['scheme']) ? $parsed_url['scheme'] . '://' : '';
-	$host     = isset($parsed_url['host']) ? $parsed_url['host'] : '';
-	$port     = isset($parsed_url['port']) ? ':' . $parsed_url['port'] : '';
-	$user     = isset($parsed_url['user']) ? $parsed_url['user'] : '';
-	$pass     = isset($parsed_url['pass']) ? ':' . $parsed_url['pass']  : '';
-	$pass     = ($user || $pass) ? "$pass@" : '';
-	$path     = isset($parsed_url['path']) ? $parsed_url['path'] : '';
-	$query    = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
-	$fragment = isset($parsed_url['fragment']) ? '#' . $parsed_url['fragment'] : '';
-	return "$scheme$user$pass$host$port$path$query$fragment";
-}
+$runscope_for_wordpress = new Runscope_For_Wordpress;
