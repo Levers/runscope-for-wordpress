@@ -10,6 +10,8 @@
 
 **Stable tag:** trunk
 
+[![Build Status](https://travis-ci.org/Levers/runscope-for-wordpress.png?branch=master)](https://travis-ci.org/Levers/runscope-for-wordpress)
+
 Allows developers to turn on complete or partial interception of any request through the WordPress HTTP API using Runscope.
 
 ## Installation ##
