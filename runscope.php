@@ -38,28 +38,24 @@ class Runscope_For_Wordpress {
 		add_filter( 'pre_http_request', array( $this, 'runscope_request' ), 10, 3 );
 	}
 
-	public function runscope_request( $content, $r, $url )
-	{
+	public function runscope_request( $content, $r, $url ) {
 		$bucket = get_option( 'runscope_bucket_id' );
 
-		if ( empty( $bucket ) or strstr( $url, 'runscope' ) )
-		{
+		if ( empty( $bucket ) or strstr( $url, 'runscope' ) ) {
 			return false;
 		}
 
-		$parsed = parse_url($url);
+		$parsed = parse_url( $url );
 
 		$parsed['host'] = str_replace( '.', '-', $parsed['host'] ).'-'.$bucket.'.runscope.net';
 
 		$url = $this->unparse_url($parsed);
 
-		if ( isset( $r['headers']['Host'] ) )
-		{
+		if ( isset( $r['headers']['Host'] ) ) {
 			$r['headers']['Host'] = $parsed['host'];
 		}
 
 		$http = _wp_http_get_object();
-
 		$http->request( $url, $r );
 
 		return false;
@@ -75,6 +71,7 @@ class Runscope_For_Wordpress {
 		$path     = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
 		$query    = isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '';
 		$fragment = isset( $parsed_url['fragment'] ) ? '#' . $parsed_url['fragment'] : '';
+
 		return "$scheme$user$pass$host$port$path$query$fragment";
 	}
 
